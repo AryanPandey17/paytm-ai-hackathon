@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #002e6e;
+  --color-navy-900: #001a42;
+  --color-navy-800: #00235a;
+  --color-navy-700: #0a3a80;
+  --color-sky: #00baf2;
+  --color-sky-600: #0099d6;
+  --color-sky-50: #e8f8fe;
+  --color-sky-100: #cdf0fc;
+  --color-ink: #0b1b35;
+  --color-muted: #5b6b82;
+  --color-line: #e3eaf3;
+  --color-canvas: #f4f8fc;
+  --color-good: #12a150;
+  --color-warn: #e09100;
+  --color-bad: #d93a3a;
+  --color-wa: #25d366;
+  --color-wa-bg: #efeae2;
+  --color-wa-out: #d9fdd3;
+  --font-sans: "Inter", "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+}
+
+html, body, #root { height: 100%; }
+body { @apply bg-canvas text-ink antialiased; font-feature-settings: "cv11", "ss01"; }
+
+@utility card { @apply bg-white rounded-2xl border border-line shadow-[0_1px_2px_rgba(0,46,110,0.04),0_8px_24px_-12px_rgba(0,46,110,0.12)]; }
+@utility btn { @apply inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none; }
+@utility btn-primary { @apply btn bg-sky text-white hover:bg-sky-600 shadow-[0_6px_16px_-6px_rgba(0,186,242,0.7)]; }
+@utility btn-navy { @apply btn bg-navy text-white hover:bg-navy-700; }
+@utility btn-ghost { @apply btn bg-white text-navy border border-line hover:border-sky hover:text-sky-600; }
+@utility chip { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold; }
+@utility label { @apply text-[11px] font-semibold uppercase tracking-wider text-muted; }
+.tbl th { @apply text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-3 py-2 border-b border-line bg-canvas/60; }
+.tbl td { @apply px-3 py-2.5 text-sm border-b border-line/70; }
+.tbl tr:last-child td { @apply border-b-0; }
+
+.wa-pattern {
+  background-color: var(--color-wa-bg);
+  background-image: radial-gradient(rgba(0,0,0,0.035) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.animate-in { animation: slideIn .35s ease-out both; }
+@keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(0,186,242,.55); } 100% { box-shadow: 0 0 0 10px rgba(0,186,242,0); } }
+.live-dot { animation: pulseRing 1.6s infinite; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #c9d6e6; border-radius: 8px; }

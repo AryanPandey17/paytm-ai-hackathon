@@ -1,0 +1,9 @@
+.env
+backend/.venv/
+backend/data/
+__pycache__/
+*.pyc
+frontend/node_modules/
+frontend/dist/
+demo/audio/
+.pytest_cache/

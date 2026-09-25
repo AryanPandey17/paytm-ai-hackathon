@@ -1,0 +1,24 @@
+[project]
+name = "commerceos-backend"
+version = "0.1.0"
+description = "Paytm Commerce OS - multi-agent AI teammates for merchants (hackathon prototype)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",
+    "pydantic-settings>=2.4",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+# Real Cognee memory graph. Install with: uv sync --extra memory
+memory = ["cognee>=0.3"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+[tool.pytest.ini_options]
+pythonpath = ["."]

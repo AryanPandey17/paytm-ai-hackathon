@@ -1,0 +1,19 @@
+# Runs n8n locally. The backend + frontend run with uv / npm (see README).
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=Asia/Kolkata
+      - TZ=Asia/Kolkata
+      # Public HTTPS URL (ngrok / cloudflared) — required for the WhatsApp Trigger webhook
+      - WEBHOOK_URL=${N8N_PUBLIC_URL:-http://localhost:5678/}
+      - N8N_RUNNERS_ENABLED=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro
+volumes:
+  n8n_data:

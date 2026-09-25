@@ -1,0 +1,76 @@
+{
+  "name": "CommerceOS · WF2 udhaar-nudge",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "udhaar-nudge",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "c2dbca2d-5315-49dd-8ad6-6c434cac7a2b",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE",
+          "name": "CommerceOS secret"
+        }
+      },
+      "webhookId": "99e152d0-c423-451d-8a6e-e27fbba9f732"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_WITH_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $('Webhook').item.json.body.to }}",
+        "textBody": "={{ $('Webhook').item.json.body.text }}",
+        "additionalFields": {}
+      },
+      "id": "9c6637fe-ba15-4f81-936f-0587d12f1430",
+      "name": "WhatsApp: payment reminder",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp: payment reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": [],
+  "notes": "Grower → customer payment reminder with Paytm Collect link. Outside the 24h window use an approved template instead of free text."
+}

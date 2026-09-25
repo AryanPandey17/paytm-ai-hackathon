@@ -1,0 +1,152 @@
+{
+  "name": "CommerceOS · WF7 whatsapp-send",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-send",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "5fb3f764-59fa-4712-b620-2dd43d521505",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE",
+          "name": "CommerceOS secret"
+        }
+      },
+      "webhookId": "af7473c8-ebc1-4d23-a803-f64d250d3b42"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $('Webhook').item.json.body.audio_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cf86b90a-a585-4f3d-bdde-1d0d62f09daa",
+      "name": "Audio?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_WITH_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $('Webhook').item.json.body.to }}",
+        "messageType": "audio",
+        "mediaPath": "useMediaLink",
+        "mediaLink": "={{ $('Webhook').item.json.body.audio_url }}",
+        "additionalFields": {}
+      },
+      "id": "01514fb4-669a-48f3-80c8-3c8d1bae9859",
+      "name": "WhatsApp: audio",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        200
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_WITH_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $('Webhook').item.json.body.to }}",
+        "textBody": "={{ $('Webhook').item.json.body.text }}",
+        "additionalFields": {}
+      },
+      "id": "d4f05206-d500-4fb5-9348-122d710b84de",
+      "name": "WhatsApp: text",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        420
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Audio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio?": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp: audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WhatsApp: text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": [],
+  "notes": "Generic outbound: every agent reply/offer/brief goes out here. Voice briefs are sent as audio (needs a public backend URL)."
+}

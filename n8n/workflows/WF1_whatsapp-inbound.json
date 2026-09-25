@@ -1,0 +1,327 @@
+{
+  "name": "CommerceOS · WF1 whatsapp-inbound",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ]
+      },
+      "id": "fad72d22-1cc4-4e9d-a58d-dca8f0f7d7cc",
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp OAuth account"
+        }
+      },
+      "webhookId": "cae68701-3859-4761-a031-b01356f4d6b8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "backend_url",
+              "value": "http://host.docker.internal:8000",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "secret",
+              "value": "change-me",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "3b0055ff-0bb1-43f4-b48d-a72936e76525",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $('WhatsApp Trigger').item.json.messages }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "155c3f2a-6e22-4381-aa76-22e93682ad77",
+      "name": "Is a message?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+              "rightValue": "audio",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cfb7ea35-c2ee-4b5e-9740-33df1c496739",
+      "name": "Is voice note?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $('WhatsApp Trigger').item.json.messages[0].audio.id }}"
+      },
+      "id": "9520a839-2a00-4079-9e39-2736deb39ddd",
+      "name": "Get media URL",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        880,
+        180
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "b290a496-c773-4e8f-8d70-3e25b3c2fa28",
+      "name": "Download audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        180
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.backend_url }}/api/ingest/voice",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CommerceOS-Secret",
+              "value": "={{ $('Config').item.json.secret }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "from_number",
+              "value": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+            },
+            {
+              "name": "source",
+              "value": "whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d60297af-9b94-4084-ad63-6e1bdfa7f1ab",
+      "name": "Backend: voice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.backend_url }}/api/ingest/whatsapp",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CommerceOS-Secret",
+              "value": "={{ $('Config').item.json.secret }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from_number: $('WhatsApp Trigger').item.json.messages[0].from, type: $('WhatsApp Trigger').item.json.messages[0].type, text: $('WhatsApp Trigger').item.json.messages[0].text ? $('WhatsApp Trigger').item.json.messages[0].text.body : null, button_payload: $('WhatsApp Trigger').item.json.messages[0].interactive ? ($('WhatsApp Trigger').item.json.messages[0].interactive.button_reply || $('WhatsApp Trigger').item.json.messages[0].interactive.list_reply || {}).title : ($('WhatsApp Trigger').item.json.messages[0].button ? $('WhatsApp Trigger').item.json.messages[0].button.text : null) }) }}",
+        "options": {}
+      },
+      "id": "c58011d3-df11-443f-8d60-7417150ede7b",
+      "name": "Backend: text",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Is a message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is a message?": {
+      "main": [
+        [
+          {
+            "node": "Is voice note?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is voice note?": {
+      "main": [
+        [
+          {
+            "node": "Get media URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Backend: text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media URL": {
+      "main": [
+        [
+          {
+            "node": "Download audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download audio": {
+      "main": [
+        [
+          {
+            "node": "Backend: voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": [],
+  "notes": "Receives every WhatsApp message to the business number. Voice notes are downloaded and sent to the backend for Sarvam STT; text/button replies go to /api/ingest/whatsapp. The backend replies through WF7."
+}

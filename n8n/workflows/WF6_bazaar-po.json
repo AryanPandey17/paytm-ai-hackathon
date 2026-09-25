@@ -1,0 +1,100 @@
+{
+  "name": "CommerceOS · WF6 bazaar-po",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bazaar-po",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "eb38a473-b8a0-45e5-adfb-35d92d66a676",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE",
+          "name": "CommerceOS secret"
+        }
+      },
+      "webhookId": "6af876f8-104a-4d9f-adc3-90f02add10fb"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body;\nconst lines = (b.items || []).map(i => `• ${i.name} × ${i.qty} @ ₹${i.unit_price}`).join('\\n');\nreturn [{ json: { to: b.supplier_phone, text: `🧾 *PO #${b.po_id}* from ${b.merchant}\\n${lines}\\nTotal: ₹${Math.round(b.total)}\\nAdvance via ${b.advance_via}. Please confirm delivery date.` } }];"
+      },
+      "id": "f8c5dca9-f351-47e9-a6e0-91ac9bce9ae0",
+      "name": "Format PO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_WITH_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $json.to }}",
+        "textBody": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "id": "26b38e3b-c1ab-4d72-af7d-04f652abd469",
+      "name": "WhatsApp: PO to supplier",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format PO": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp: PO to supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": [],
+  "notes": "Bazaar auto-PO: formats the purchase order and sends it to the supplier on WhatsApp (ONDC/API suppliers can branch here)."
+}
