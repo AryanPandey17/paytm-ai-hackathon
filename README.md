@@ -59,6 +59,57 @@ Every step streams live into the activity feed, following the 6-step loop: Hear 
 
 ---
 
+## Screenshots
+
+### Command Center
+KPIs across the portfolio, the Commander's daily plan, quick actions for each agent and the live activity feed.
+
+![Command Center](screenshots/command-center.png)
+
+### WhatsApp Studio
+Three phones side by side: the merchant (Ramesh), a customer (Sharma ji) and the ops approver. Shows the voice note, payment link, credit approval and weekly voice brief in one flow.
+
+![WhatsApp Studio](screenshots/whatsapp.png)
+
+### Merchant 360
+Ramesh Kirana Stores: weekly sales, UPI share, open udhaar, low-stock items, the daily sales chart and the udhaar book with Nudge / Paid actions.
+
+![Merchant 360](screenshots/merhant.png)
+
+Further down: festival stock readiness, credit offers, purchase orders drafted by Bazaar, and customers with household and churn risk (Pulse).
+
+![Merchant 360: stock, credit and customers](screenshots/grower.png)
+
+### Lifecycle
+**Hunter**: leads scored on non-personal signals only, with the chosen outreach channel.
+
+![Lifecycle: Hunter](screenshots/hunter.png)
+
+**Onboarder**: 5 parallel KYC tracks per merchant. Exceptions are auto-resolved or escalated to a human.
+
+![Lifecycle: Onboarder](screenshots/onboarder.png)
+
+**Activator**: device-to-first-transaction progress, stuck-device alerts and field agent assignment.
+
+![Lifecycle: Activator](screenshots/activator.png)
+
+### Human-in-the-loop
+Approvals raised when a guardrail fires, e.g. a credit offer above ₹25,000. The same request goes to the ops approver on WhatsApp.
+
+![Human-in-the-loop](screenshots/humanloop.png)
+
+### Memory Graph
+The shared Merchant Memory Graph: merchant, customers, households, agents, suppliers, offers and signals.
+
+![Memory Graph](screenshots/mmg.png)
+
+### System & Partners
+Status of Sarvam, Cognee, n8n and WhatsApp, plus the live LLM fallback chain and a "Try the chain" box.
+
+![System & Partners](screenshots/system.png)
+
+---
+
 ## Architecture
 
 ```
